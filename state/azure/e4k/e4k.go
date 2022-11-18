@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -32,8 +33,8 @@ import (
 	"github.com/dapr/components-contrib/state"
 	"github.com/dapr/kit/logger"
 
+	metadata "github.com/dapr/components-contrib/metadata"
 	mqtt "github.com/eclipse/paho.golang/paho"
-
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/go-spiffe/v2/svid/jwtsvid"
 	"github.com/spiffe/go-spiffe/v2/workloadapi"
@@ -112,6 +113,13 @@ func NewAzureE4KStore(logger logger.Logger) state.Store {
 	s.DefaultBulkStore = state.NewDefaultBulkStore(s)
 
 	return s
+}
+
+func (r *StateStore) GetComponentMetadata() map[string]string {
+	metadataStruct := e4kMetadata{}
+	metadataInfo := map[string]string{}
+	metadata.GetMetadataInfoFromStructType(reflect.TypeOf(metadataStruct), &metadataInfo)
+	return metadataInfo
 }
 
 func populateSATPassword(r *StateStore) {
